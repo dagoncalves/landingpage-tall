@@ -1,6 +1,6 @@
 <div class="flex flex-col w-full h-screen bg-indigo-900" x-data="{
-            showSubscribe: true,
-            showSuccess: true,
+            showSubscribe: @entangle('showSubscribe'),
+            showSuccess: @entangle('showSuccess'),
         }">
     <nav class="container flex justify-between p-5 mx-auto text-indigo-200">
         <a class="text-4xl font-bold" href="/">
@@ -35,12 +35,19 @@
         </p>
         <form class="flex flex-col items-center p-24" wire:submit.prevent="subscribe">
             <x-input class="px-5 py-3 border border-blue-400 w-80" type="email" name="email" placeholder="Email address"
-                wire:model='email'></x-input>
+                wire:model.defer='email'></x-input>
+
             <span class="text-xs text-gray-100">
-                We will send you a confirmation email.
+                {{
+                $errors->has('email')
+                ? $errors->first('email')
+                : 'We will send you a confirmation email.'
+                }}
             </span>
+
             <x-button class="justify-center px-5 py-3 mt-5 bg-blue-500 w-80">
-                Get in
+                <span class="animate-spin" wire:loading wire:target='subscribe'>&#9696;</span>
+                <span wire:loading.remove wire:target='subscribe'>Get in</span>
             </x-button>
         </form>
     </x-modal>
@@ -52,8 +59,14 @@
         <p class="mt-16 text-5xl font-extrabold text-center text-white">
             Great!
         </p>
+        @if (request()->has('verified') && request()->verified == 1)
+        <p class="text-3xl text-center text-white">
+            Thanks for confirming.
+        </p>
+        @else
         <p class="text-3xl text-center text-white">
             See you in your box.
         </p>
+        @endif
     </x-modal>
 </div>
